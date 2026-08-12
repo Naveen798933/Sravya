@@ -27,7 +27,7 @@ export const birthdayConfig: BirthdayConfig = {
   developer: "Gully_Developer",
   instagramUsername: "gully_developer",
   instagramUrl: "https://www.instagram.com/gully_developer/",
-  photoUrl: "/sravya_photo.png",
+  photoUrl: "./sravya_photo.png",
 };
 
 export const birthdayMessages = {

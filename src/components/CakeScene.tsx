@@ -75,6 +75,10 @@ export const CakeScene: React.FC<CakeSceneProps> = ({ onProceedToFinal }) => {
     }
 
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setMicError('Mic blow detection is unsupported in this browser/connection. Tap candles or use Blow All!');
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       micStreamRef.current = stream;
 
