@@ -273,6 +273,60 @@ class SoundManager {
     this.musicTimer = window.setInterval(playNote, 600);
   }
 
+  // Play sparkling chime on card reveal or special action
+  public playSparkleChime() {
+    if (!this.soundEnabled) return;
+    this.initCtx();
+    if (!this.ctx || !this.sfxGain) return;
+
+    const notes = [1046.5, 1318.51, 1567.98, 2093.0]; // C6, E6, G6, C7
+    notes.forEach((freq, idx) => {
+      if (!this.ctx || !this.sfxGain) return;
+      const now = this.ctx.currentTime + idx * 0.06;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(now);
+      osc.stop(now + 0.35);
+    });
+  }
+
+  // Play wish unlock chord
+  public playWishUnlock() {
+    if (!this.soundEnabled) return;
+    this.initCtx();
+    if (!this.ctx || !this.sfxGain) return;
+
+    const chords = [587.33, 739.99, 880.0, 1174.66]; // D5, F#5, A5, D6
+    chords.forEach((freq, idx) => {
+      if (!this.ctx || !this.sfxGain) return;
+      const now = this.ctx.currentTime + idx * 0.04;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(now);
+      osc.stop(now + 0.5);
+    });
+  }
+
   public stopMusic() {
     this.isMusicPlaying = false;
     if (this.musicTimer !== null) {

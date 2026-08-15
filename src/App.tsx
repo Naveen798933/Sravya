@@ -79,7 +79,7 @@ export function App() {
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => { const e = soundManager.toggleMusic(); setMusicOn(e); }}
-            className={`p-2 rounded-xl transition-all glass-card border text-xs flex items-center gap-1.5 ${
+            className={`p-2 rounded-xl transition-all glass-card border text-xs flex items-center gap-1.5 cursor-pointer ${
               musicOn ? 'border-purple-400 text-purple-300 shadow-glow' : 'border-slate-800 text-slate-500'
             }`}
             title="Toggle Music"
@@ -90,7 +90,7 @@ export function App() {
 
           <button
             onClick={() => { const e = soundManager.toggleSound(); setSoundOn(e); }}
-            className={`p-2 rounded-xl transition-all glass-card border text-xs flex items-center gap-1.5 ${
+            className={`p-2 rounded-xl transition-all glass-card border text-xs flex items-center gap-1.5 cursor-pointer ${
               soundOn ? 'border-purple-400 text-purple-300 shadow-glow' : 'border-slate-800 text-slate-500'
             }`}
             title="Toggle Sound Effects"
@@ -99,10 +99,29 @@ export function App() {
             <span className="hidden sm:inline font-medium">{soundOn ? 'SFX ON' : 'SFX OFF'}</span>
           </button>
 
+          {/* Quick Scene Selector for testing and navigation */}
+          <select
+            value={phase}
+            onChange={(e) => {
+              const target = e.target.value as AppPhase;
+              if (target === 'photo') setPhotoUnlocked(true);
+              transitionTo(target);
+            }}
+            className="p-1.5 sm:p-2 rounded-xl glass-card border border-purple-500/30 text-purple-200 text-xs bg-purple-950/80 focus:outline-none focus:border-purple-400 transition-colors cursor-pointer hidden md:block"
+            title="Jump to Scene"
+          >
+            <option value="landing" className="bg-[#120824]">🌟 Home</option>
+            <option value="intro" className="bg-[#120824]">🎬 Intro</option>
+            <option value="game" className="bg-[#120824]">🎮 Quest Game</option>
+            <option value="photo" className="bg-[#120824]">📸 Photo Reveal</option>
+            <option value="cake" className="bg-[#120824]">🎂 Cake & Candles</option>
+            <option value="final" className="bg-[#120824]">🎉 Grand Surprise</option>
+          </select>
+
           {phase !== 'landing' && (
             <button
               onClick={handleRestartQuest}
-              className="p-2 rounded-xl glass-card border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 text-xs flex items-center gap-1 transition-all"
+              className="p-2 rounded-xl glass-card border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 text-xs flex items-center gap-1 transition-all cursor-pointer"
               title="Reset Quest"
             >
               <RotateCcw className="w-3.5 h-3.5" />

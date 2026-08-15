@@ -30,6 +30,50 @@ export const birthdayConfig: BirthdayConfig = {
   photoUrl: "./sravya_photo.png",
 };
 
+export interface WishCard {
+  id: number;
+  icon: string;
+  title: string;
+  subtitle: string;
+  message: string;
+  color: string;
+}
+
+export const birthdayWishesCards: WishCard[] = [
+  {
+    id: 1,
+    icon: '✨',
+    title: 'Endless Happiness',
+    subtitle: 'Joy & Bright Smiles',
+    message: 'May every single day bring you countless reasons to smile, laughter with loved ones, and pure warmth in your heart!',
+    color: 'from-amber-500/20 to-pink-500/20 border-amber-400/40',
+  },
+  {
+    id: 2,
+    icon: '🌟',
+    title: 'Boundless Success',
+    subtitle: 'Shine in All You Do',
+    message: 'Wishing you towering achievements in all your studies, career goals, and creative pursuits. You have the power to achieve greatness!',
+    color: 'from-purple-500/20 to-indigo-500/20 border-purple-400/40',
+  },
+  {
+    id: 3,
+    icon: '💖',
+    title: 'True Friendship',
+    subtitle: 'Unbreakable Bonds',
+    message: 'Surround yourself with genuine companionship, loving memories, and friends who always support and cherish you!',
+    color: 'from-pink-500/20 to-rose-500/20 border-pink-400/40',
+  },
+  {
+    id: 4,
+    icon: '🌸',
+    title: 'Dream Big & Bold',
+    subtitle: '18th Milestone Year',
+    message: 'Step courageously into this special year with wonder, curiosity, and fearless confidence. The future belongs to you, Sravya!',
+    color: 'from-fuchsia-500/20 to-purple-600/20 border-fuchsia-400/40',
+  },
+];
+
 export const birthdayMessages = {
   introTitle: "A Secret Birthday Mission Awaits...",
   introSub: "Welcome Sravya! A special quest created with love just for you.",

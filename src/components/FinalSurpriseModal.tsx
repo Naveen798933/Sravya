@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import { birthdayConfig, birthdayMessages } from '../config/birthdayConfig';
+import React, { useEffect, useState } from 'react';
+import { birthdayConfig, birthdayMessages, birthdayWishesCards, type WishCard } from '../config/birthdayConfig';
 import { soundManager } from '../utils/soundManager';
 import { FireworksCanvas } from './FireworksCanvas';
-import { Heart, Sparkles, RefreshCw, Star } from 'lucide-react';
+import { Heart, Sparkles, RefreshCw, Star, Share2, Check, Image as ImageIcon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface FinalSurpriseModalProps {
@@ -10,43 +10,90 @@ interface FinalSurpriseModalProps {
 }
 
 export const FinalSurpriseModal: React.FC<FinalSurpriseModalProps> = ({ onRestartQuest }) => {
+  const [openedWishId, setOpenedWishId] = useState<number | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+
   useEffect(() => {
     soundManager.playLevelClear();
 
-    const duration = 5000;
+    const duration = 4500;
     const end = Date.now() + duration;
 
     const frame = () => {
       confetti({
-        particleCount: 5,
+        particleCount: 4,
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: ['#a855f7', '#ec4899', '#fbbf24'],
+        colors: ['#a855f7', '#ec4899', '#fbbf24', '#ffffff'],
       });
       confetti({
-        particleCount: 5,
+        particleCount: 4,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: ['#a855f7', '#ec4899', '#fbbf24'],
+        colors: ['#a855f7', '#ec4899', '#fbbf24', '#ffffff'],
       });
       if (Date.now() < end) requestAnimationFrame(frame);
     };
     frame();
   }, []);
 
+  const handleWishCardClick = (card: WishCard) => {
+    if (openedWishId === card.id) {
+      setOpenedWishId(null);
+      return;
+    }
+    setOpenedWishId(card.id);
+    soundManager.playWishUnlock();
+    confetti({
+      particleCount: 40,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#a855f7', '#ec4899', '#fbbf24'],
+    });
+  };
+
+  const handleShare = async () => {
+    soundManager.playSparkleChime();
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: `Happy Birthday ${birthdayConfig.name}! 🎂`,
+      text: `Join the magical birthday surprise quest for ${birthdayConfig.name}! ✨`,
+      url: shareUrl,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        // User cancelled or fallback to clipboard
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    } catch {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-2xl overflow-y-auto">
       <FireworksCanvas active={true} intensity="high" />
 
-      <div className="relative max-w-xl w-full z-10 text-center space-y-8 my-auto">
+      <div className="relative max-w-2xl w-full z-10 text-center space-y-6 my-auto pt-6 pb-10">
 
         {/* Giant 3D Glowing Heart with Orbit Rings */}
-        <div className="relative flex justify-center animate-stagger-1">
+        <div className="relative flex justify-center animate-stagger-1 my-2">
           {/* Orbit rings around the heart */}
           <div
-            className="absolute"
+            className="absolute pointer-events-none"
             style={{
               width: '180px', height: '180px',
               top: '50%', left: '50%',
@@ -79,7 +126,7 @@ export const FinalSurpriseModal: React.FC<FinalSurpriseModalProps> = ({ onRestar
               }} />
             </div>
 
-            {/* Ring 2 — reverse, wider */}
+            {/* Ring 2 */}
             <div
               style={{
                 position: 'absolute', inset: '-20px',
@@ -96,16 +143,9 @@ export const FinalSurpriseModal: React.FC<FinalSurpriseModalProps> = ({ onRestar
                 background: '#ec4899',
                 boxShadow: '0 0 12px #ec4899',
               }} />
-              <div style={{
-                position: 'absolute', right: '-5px', top: '50%',
-                transform: 'translateY(-50%)',
-                width: '8px', height: '8px', borderRadius: '50%',
-                background: '#f9a8d4',
-                boxShadow: '0 0 8px #f9a8d4',
-              }} />
             </div>
 
-            {/* Ring 3 — amber, different tilt */}
+            {/* Ring 3 */}
             <div
               style={{
                 position: 'absolute', inset: '-40px',
@@ -127,72 +167,158 @@ export const FinalSurpriseModal: React.FC<FinalSurpriseModalProps> = ({ onRestar
 
           {/* Central heart orb */}
           <div
-            className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full p-1 flex items-center justify-center animate-glow-3d"
+            className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1 flex items-center justify-center animate-glow-3d cursor-pointer hover:scale-105 transition-transform"
+            onClick={() => {
+              soundManager.playSparkleChime();
+              confetti({ particleCount: 35, spread: 80, origin: { y: 0.3 } });
+            }}
             style={{
               background: 'linear-gradient(135deg, #7c3aed, #db2777, #f59e0b)',
               boxShadow: '0 0 50px rgba(168,85,247,0.6), 0 0 100px rgba(236,72,153,0.3)',
             }}
           >
-            <div className="w-full h-full rounded-full bg-purple-950/80 flex items-center justify-center backdrop-blur-md">
+            <div className="w-full h-full rounded-full bg-purple-950/85 flex items-center justify-center backdrop-blur-md">
               <Heart
-                className="w-16 h-16 sm:w-20 sm:h-20 text-pink-400 fill-pink-400"
-                style={{
-                  animation: 'heartbeat 1.5s ease-in-out infinite',
-                  filter: 'drop-shadow(0 0 20px #ec4899)',
-                }}
+                className="w-14 h-14 sm:w-18 sm:h-18 text-pink-400 fill-pink-400 animate-heartbeat"
+                style={{ filter: 'drop-shadow(0 0 20px #ec4899)' }}
               />
             </div>
           </div>
         </div>
 
         {/* Content with staggered entrance */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Victory badge */}
-          <div className="flex items-center justify-center gap-3 animate-stagger-2">
-            <Star className="w-5 h-5 text-amber-300 fill-amber-300 animate-star-pop" />
-            <span className="text-xs uppercase tracking-widest text-pink-300 font-bold">
-              QUEST COMPLETED — VICTORY!
-            </span>
-            <Star className="w-5 h-5 text-amber-300 fill-amber-300 animate-star-pop" style={{ animationDelay: '0.15s' }} />
+          <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-purple-950/80 border border-purple-400/40 text-xs font-bold text-pink-300 shadow-glow animate-stagger-2">
+            <Star className="w-4 h-4 text-amber-300 fill-amber-300 animate-star-pop" />
+            <span>QUEST COMPLETED — BIRTHDAY VICTORY!</span>
+            <Star className="w-4 h-4 text-amber-300 fill-amber-300 animate-star-pop" style={{ animationDelay: '0.15s' }} />
           </div>
 
           {/* Main title */}
           <h1
             className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-300 to-amber-200 tracking-tight animate-stagger-3 text-glow-pink"
-            style={{ lineHeight: 1.1 }}
+            style={{ lineHeight: 1.15 }}
           >
             {birthdayMessages.finalTitle}
           </h1>
 
-          <p className="text-xs font-semibold text-purple-300 animate-stagger-3">
-            {birthdayConfig.dobFormatted}
+          <p className="text-xs font-bold tracking-widest text-purple-300 uppercase">
+            ✦ {birthdayConfig.dobFormatted} • CELEBRATING 18 MAGICAL YEARS ✦
           </p>
 
           {/* Message card */}
           <div
-            className="glass-card p-6 sm:p-8 rounded-3xl border border-purple-400/50 shadow-2xl space-y-4 text-purple-100 text-sm sm:text-base leading-relaxed text-left bg-purple-950/40 animate-stagger-4"
+            className="glass-card p-5 sm:p-7 rounded-3xl border border-purple-400/50 shadow-2xl space-y-3 text-purple-100 text-sm sm:text-base leading-relaxed text-left bg-purple-950/40 animate-stagger-4"
             style={{ boxShadow: '0 0 40px rgba(168,85,247,0.2), 0 8px 32px rgba(0,0,0,0.5)' }}
           >
-            <div className="flex items-center gap-2 text-pink-300 font-bold border-b border-purple-500/30 pb-3">
-              <Sparkles className="w-5 h-5 text-amber-400" style={{ animation: 'starSpin 3s linear infinite' }} />
-              <span>A Personal Note for Gudapati Sravya</span>
+            <div className="flex items-center justify-between border-b border-purple-500/30 pb-3">
+              <div className="flex items-center gap-2 text-pink-300 font-bold">
+                <Sparkles className="w-5 h-5 text-amber-400" style={{ animation: 'starSpin 3s linear infinite' }} />
+                <span>A Personal Birthday Note</span>
+              </div>
+              <button
+                onClick={() => setShowPhotoModal(!showPhotoModal)}
+                className="px-3 py-1 rounded-xl bg-purple-800/50 hover:bg-purple-700/60 border border-purple-400/30 text-xs font-semibold text-pink-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>{showPhotoModal ? 'Hide Photo' : 'View Memory Photo'}</span>
+              </button>
             </div>
+            
+            {showPhotoModal && (
+              <div className="py-2 animate-fade-in flex justify-center">
+                <div className="relative max-w-[220px] rounded-2xl overflow-hidden border border-purple-400/50 shadow-glow">
+                  <img
+                    src={birthdayConfig.photoUrl}
+                    alt={birthdayConfig.name}
+                    className="w-full h-auto object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-2">
+                    <p className="text-[11px] font-bold text-pink-200">{birthdayConfig.name}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <p>{birthdayMessages.finalMessage}</p>
+          </div>
+
+          {/* Interactive Birthday Wish & Blessing Cards */}
+          <div className="space-y-3 pt-2 text-left">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-xs uppercase tracking-wider font-bold text-pink-300 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                Tap to Unlock Special Birthday Blessings:
+              </h3>
+              <span className="text-[11px] text-purple-300 font-medium">
+                {openedWishId ? '1 opened' : '4 hidden'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {birthdayWishesCards.map((card) => {
+                const isOpen = openedWishId === card.id;
+                return (
+                  <div
+                    key={card.id}
+                    onClick={() => handleWishCardClick(card)}
+                    className={`glass-card p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer select-none bg-gradient-to-br ${
+                      card.color
+                    } ${
+                      isOpen
+                        ? 'scale-[1.02] shadow-glow-pink ring-1 ring-pink-400/50'
+                        : 'hover:scale-[1.01] hover:border-purple-300/50'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <span className="text-2xl p-1 rounded-xl bg-purple-950/60 border border-purple-500/30 flex-shrink-0">
+                        {card.icon}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-bold text-white text-sm truncate">{card.title}</h4>
+                          <span className="text-[10px] text-pink-300 font-semibold px-2 py-0.5 rounded-full bg-purple-900/60 border border-purple-400/20">
+                            {isOpen ? 'Unlocked ✨' : 'Tap to reveal'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-purple-200/80 font-medium">{card.subtitle}</p>
+                        
+                        {isOpen && (
+                          <p className="text-xs text-pink-100 font-medium mt-2 pt-2 border-t border-purple-400/20 animate-fade-in leading-relaxed">
+                            "{card.message}"
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="space-y-4 animate-stagger-5">
-          <button
-            onClick={() => { soundManager.playClick(); onRestartQuest(); }}
-            className="btn-3d w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-bold text-base shadow-xl shadow-purple-500/30 hover:opacity-95 transition-all flex items-center justify-center gap-2 overflow-hidden relative group"
-          >
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-all duration-700" />
-            <RefreshCw className="w-5 h-5 relative z-10" />
-            <span className="relative z-10">Replay Birthday Quest 🎮</span>
-          </button>
+        <div className="space-y-3 animate-stagger-5 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              onClick={handleShare}
+              className="btn-3d w-full py-3.5 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white font-bold text-sm shadow-xl shadow-pink-500/25 hover:opacity-95 transition-all flex items-center justify-center gap-2 overflow-hidden relative group cursor-pointer"
+            >
+              {copiedLink ? <Check className="w-4 h-4 text-green-300" /> : <Share2 className="w-4 h-4 text-pink-200" />}
+              <span>{copiedLink ? 'Link Copied to Clipboard! 🎉' : 'Share Celebration Link 💌'}</span>
+            </button>
 
-          <div className="text-center space-y-1 text-xs text-purple-300">
+            <button
+              onClick={() => { soundManager.playClick(); onRestartQuest(); }}
+              className="btn-3d w-full py-3.5 rounded-2xl bg-purple-900/80 hover:bg-purple-800/90 border border-purple-400/40 text-purple-100 font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <RefreshCw className="w-4 h-4 text-amber-300" />
+              <span>Replay Quest 🎮</span>
+            </button>
+          </div>
+
+          <div className="text-center space-y-1 text-xs text-purple-300 pt-2">
             <p>{birthdayMessages.footerText}</p>
             <p className="flex items-center justify-center gap-1.5 font-medium">
               Developed by{' '}
@@ -214,3 +340,4 @@ export const FinalSurpriseModal: React.FC<FinalSurpriseModalProps> = ({ onRestar
     </div>
   );
 };
+
