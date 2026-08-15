@@ -337,10 +337,10 @@ export const CakeScene: React.FC<CakeSceneProps> = ({ onProceedToFinal }) => {
                   soundManager.playClick();
                   onProceedToFinal();
                 }}
-                className="btn-3d w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-pink-500 to-purple-600 text-white font-black text-lg shadow-2xl shadow-pink-500/50 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
+                className="btn-3d w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 via-pink-500 to-purple-600 text-white font-black text-lg shadow-2xl shadow-pink-500/50 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 cursor-pointer"
               >
                 <Gift className="w-6 h-6 animate-bounce text-yellow-200" />
-                <span>🎁 Open Your Final Surprise!</span>
+                <span>🎁 Open Your Belated Birthday Surprise!</span>
               </button>
             </div>
           </div>
